@@ -15,12 +15,16 @@ MochaWeb?.testOnly ->
         playerId = Players.insert {name: "TestUser1", score: 5}
         Session.set "selectedPlayer", playerId
         # wait 100ms for button to appear, then continue
-        setTimeout (->
-          $('button.inc').click()
-          player = Players.findOne(playerId)
-          chai.assert.equal 10, player.score
-          Players.remove playerId
-          done()
+        Meteor.setTimeout (->
+          # always wrap assertions in Meteor.(...) callbacks in try/catch blocks
+          try
+            $('button.inc').click()
+            player = Players.findOne(playerId)
+            chai.assert.equal 10, player.score
+            Players.remove playerId
+            done()
+          catch assertionError
+            done(assertionError)
         ), 100
 ```
 
